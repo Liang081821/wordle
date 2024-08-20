@@ -1,99 +1,66 @@
 import React, { useReducer, useEffect } from "react";
+import { initialState, reducer } from "./wordleReducer";
 
-const initialState = {
-  cells: ["", "", "", "", ""],
-  currentIndex: 0, 
-};
-
-function reducer(state, action) {
-  switch (action.type) {
-    case "SET_CHAR": {
-      const newCells = [...state.cells];
-      if (
-        state.currentIndex === state.cells.length - 1 &&
-        newCells[state.currentIndex] !== ""
-      ) {
-        return state;
-      }
-      newCells[state.currentIndex] = action.payload;
-
-      // 計算下一個索引位置
-      const nextIndex = Math.min(
-        state.currentIndex + 1,
-        state.cells.length - 1
-      );
-
-      return {
-        ...state,
-        cells: newCells,
-        currentIndex: nextIndex,
-      };
-    }
-
-    case "BACKSPACE": {
-      const newCells = [...state.cells];
-
-      if (newCells[state.currentIndex] === "" && state.currentIndex > 0) {
-        const prevIndex = Math.max(state.currentIndex - 1, 0);
-        newCells[prevIndex] = ""; 
-
-        return {
-          ...state,
-          cells: newCells,
-          currentIndex: prevIndex,
-        };
-      } else {
-        newCells[state.currentIndex] = "";
-
-        return {
-          ...state,
-          cells: newCells,
-          currentIndex: state.currentIndex,
-        };
-      }
-    }
-    default:
-      return state;
-  }
-}
-
-//畫面功能
-
-function WorldGrid() {
+function WordleGrid() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Backspace") {
-        e.preventDefault();
         dispatch({ type: "BACKSPACE" });
       } else if (/^[a-zA-Z]$/.test(e.key)) {
-        e.preventDefault();
         dispatch({ type: "SET_CHAR", payload: e.key.toUpperCase() });
+      } else if (e.key === "Enter") {
+        const isCurrentRowFull = state.rows[state.currentRow].every(
+          (cell) => cell !== ""
+        );
+
+        if (isCurrentRowFull) {
+          dispatch({ type: "MOVE_ROW" });
+        } else {
+          console.log("當前行尚未填滿");
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [state]);
+
+  useEffect(() => {
+    const lastGuess = state.guesses[state.guesses.length - 1];
+    if (lastGuess === state.answer && state.guesses.length > 0) {
+      const timer = setTimeout(() => {
+        alert("你成功了");
+        dispatch({ type: "RESET_GAME" });
+      }, 100);
+      return () => clearTimeout(timer);
+    } else if (state.guesses.length === 6) {
+      const timer = setTimeout(() => {
+        alert("你失敗了");
+        dispatch({ type: "RESET_GAME" });
+      }, 100);
+    }
+  }, [state.currentGuess, state.guesses, state.answer]);
 
   return (
-    <>
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex space-x-1">
-          {state.cells.map((cell, index) => (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      {state.rows.map((row, rowIndex) => (
+        <div key={rowIndex} className="flex space-x-1 mb-1">
+          {row.map((cell, cellIndex) => (
             <div
-              key={index}
-              className="w-12 h-12 border border-gray-300 flex items-center justify-center text-lg font-semibold"
+              key={cellIndex}
+              className={`w-12 h-12 border border-gray-300 flex items-center justify-center text-lg font-semibold ${state.colors[rowIndex][cellIndex]}`}
             >
               {cell}
             </div>
           ))}
         </div>
-      </div>
-    </>
+      ))}
+    </div>
   );
 }
 
-export default WorldGrid;
+export default WordleGrid;
+
