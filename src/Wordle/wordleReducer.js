@@ -95,34 +95,37 @@ export function reducer(state, action) {
       };
     }
 
-    case "MOVE_ROW": {
-      const isCurrentRowFull = state.rows[state.currentRow].every(
-        (cell) => cell !== ""
-      );
-
-      if (isCurrentRowFull) {
-        const newGuesses = [...state.guesses, state.currentGuess];
-
-        const newColors = state.colors.map((row, rowIndex) =>
-          rowIndex === state.currentRow
-            ? state.rows[state.currentRow].map((cell, cellIndex) =>
-                getColorClass(cell, cellIndex, state.answer)
-              )
-            : row
+    case "MOVE_ROW":
+      {
+        const isCurrentRowFull = state.rows[state.currentRow].every(
+          (cell) => cell !== ""
         );
-        const newState = {
-          ...state,
-          currentRow: Math.min(state.currentRow + 1, state.rows.length - 1),
-          currentIndex: 0,
-          guesses: newGuesses,
-          currentGuess: "",
-          colors: newColors,
-        };
 
-        return newState;
+        if (isCurrentRowFull) {
+          const newGuesses = [...state.guesses, state.currentGuess];
+
+          const newColors = state.colors.map((row, rowIndex) =>
+            rowIndex === state.currentRow
+              ? state.rows[state.currentRow].map((cell, cellIndex) =>
+                  getColorClass(cell, cellIndex, state.answer)
+                )
+              : row
+          );
+          const newState = {
+            ...state,
+            currentRow: Math.min(state.currentRow + 1, state.rows.length - 1),
+            currentIndex: 0,
+            guesses: newGuesses,
+            currentGuess: "",
+            colors: newColors,
+          };
+
+          return newState;
+        } else {
+          console.log("當前行尚未填滿");
+        }
       }
-    }
-
+      break;
     default:
       return state;
   }

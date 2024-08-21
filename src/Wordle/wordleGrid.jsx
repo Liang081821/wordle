@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { initialState, reducer } from "./wordleReducer";
 
 function WordleGrid() {
@@ -11,22 +11,16 @@ function WordleGrid() {
       } else if (/^[a-zA-Z]$/.test(e.key)) {
         dispatch({ type: "SET_CHAR", payload: e.key.toUpperCase() });
       } else if (e.key === "Enter") {
-        const isCurrentRowFull = state.rows[state.currentRow].every(
-          (cell) => cell !== ""
-        );
-
-        if (isCurrentRowFull) {
-          dispatch({ type: "MOVE_ROW" });
-        } else {
-          console.log("當前行尚未填滿");
-        }
+        dispatch({ type: "MOVE_ROW" });
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
+    console.log("3");
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [state]);
+  }, []);
 
   useEffect(() => {
     const lastGuess = state.guesses[state.guesses.length - 1];
@@ -37,7 +31,7 @@ function WordleGrid() {
       }, 100);
       return () => clearTimeout(timer);
     } else if (state.guesses.length === 6) {
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         alert("你失敗了");
         dispatch({ type: "RESET_GAME" });
       }, 100);
@@ -63,4 +57,3 @@ function WordleGrid() {
 }
 
 export default WordleGrid;
-
