@@ -1,6 +1,6 @@
 import { useReducer, useEffect } from "react";
 import { initialState, reducer } from "./wordleReducer";
-import fetchAnswer from "./fireBase";
+import fetchAnswer from "./firebase";
 
 function WordleGrid() {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -36,39 +36,35 @@ function WordleGrid() {
   }, []);
 
   useEffect(() => {
-  const lastGuess = state.guesses[state.guesses.length - 1];
+    const lastGuess = state.guesses[state.guesses.length - 1];
 
-  const handleGameEnd = async () => {
-    if (lastGuess === state.answer && state.guesses.length > 0) {
+    const handleGameEnd = async () => {
       const timer = setTimeout(async () => {
-        alert("你成功了");
-        dispatch({ type: "RESET_GAME" });
-        try {
-          const randomAnswer = await fetchAnswer();
-          dispatch({ type: "SET_ANSWER", payload: randomAnswer });
-        } catch (error) {
-          console.error("獲取答案失敗", error);
+        if (lastGuess === state.answer && state.guesses.length > 0) {
+          alert("你成功了");
+          dispatch({ type: "RESET_GAME" });
+          try {
+            const randomAnswer = await fetchAnswer();
+            dispatch({ type: "SET_ANSWER", payload: randomAnswer });
+          } catch (error) {
+            console.error("獲取答案失敗", error);
+          }
+        } else if (state.guesses.length === 6) {
+          alert("你失敗了");
+          dispatch({ type: "RESET_GAME" });
+          try {
+            const randomAnswer = await fetchAnswer();
+            dispatch({ type: "SET_ANSWER", payload: randomAnswer });
+          } catch (error) {
+            console.error("獲取答案失敗", error);
+          }
         }
       }, 100);
       return () => clearTimeout(timer);
-    } else if (state.guesses.length === 6) {
-      const timer = setTimeout(async () => {
-        alert("你失敗了");
-        dispatch({ type: "RESET_GAME" });
-        try {
-          const randomAnswer = await fetchAnswer();
-          dispatch({ type: "SET_ANSWER", payload: randomAnswer });
-        } catch (error) {
-          console.error("獲取答案失敗", error);
-        }
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  };
+    };
 
-  handleGameEnd();
-}, [state.currentGuess, state.guesses, state.answer]);
-
+    handleGameEnd();
+  }, [state.currentGuess, state.guesses, state.answer]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">

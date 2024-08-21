@@ -15,11 +15,11 @@ export const initialState = {
 function getColorClass(letter, index, answer) {
   if (letter === answer[index]) {
     return "bg-green-500";
-  } else if (answer.includes(letter)) {
-    return "bg-yellow-500";
-  } else {
-    return "bg-gray-500";
   }
+  if (answer.includes(letter)) {
+    return "bg-yellow-500";
+  }
+  return "bg-gray-500";
 }
 
 export function reducer(state, action) {
@@ -41,11 +41,6 @@ export function reducer(state, action) {
         state.rows[state.currentRow].length - 1
       );
 
-      console.log(`row ${state.currentRow}`);
-      console.log(`index ${state.currentIndex}`);
-      console.log(`currentguess ${state.currentGuess}`);
-      console.log(`guesses ${state.guesses}`);
-      console.log(`colors ${state.colors}`);
       return {
         ...state,
         rows: newRows,
@@ -66,11 +61,6 @@ export function reducer(state, action) {
 
         const newCurrentGuess = newRows[state.currentRow].join("");
 
-        console.log(`row ${state.currentRow}`);
-        console.log(`index ${state.currentIndex}`);
-        console.log(`currentguess ${state.currentGuess}`);
-        console.log(`guesses ${state.guesses}`);
-        console.log(`colors ${state.colors}`);
         return {
           ...state,
           rows: newRows,

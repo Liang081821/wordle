@@ -4,7 +4,7 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBNaK6zpihxAs_3snOujMoznuWfJLD-RHc",
+  apiKey: import.meta.env.VITE_API_KEY,
   authDomain: "wordle-27caa.firebaseapp.com",
   projectId: "wordle-27caa",
   storageBucket: "wordle-27caa.appspot.com",
@@ -20,14 +20,14 @@ const db = getFirestore(app); // Initialize Firestore
 // Modify the fetchAnswer function to return a random answer
 const fetchAnswer = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, "Answer"));
+    const querySnapshot = await getDocs(collection(db, "answer"));
     const answers = [];
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      if ("Answer" in data) {
-        answers.push(data.Answer);
-      }
+      //   if ("Answer" in data) {
+      answers.push(data.answer);
+      //   }
     });
 
     if (answers.length > 0) {
