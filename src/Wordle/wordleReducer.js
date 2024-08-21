@@ -41,11 +41,11 @@ export function reducer(state, action) {
         state.rows[state.currentRow].length - 1
       );
 
-      //   console.log(`row ${state.currentRow}`);
-      //   console.log(`index ${state.currentIndex}`);
-      //   console.log(`currentguess ${state.currentGuess}`);
-      //   console.log(`guesses ${state.guesses}`);
-      //   console.log(`colors ${state.colors}`);
+      console.log(`row ${state.currentRow}`);
+      console.log(`index ${state.currentIndex}`);
+      console.log(`currentguess ${state.currentGuess}`);
+      console.log(`guesses ${state.guesses}`);
+      console.log(`colors ${state.colors}`);
       return {
         ...state,
         rows: newRows,
@@ -66,11 +66,11 @@ export function reducer(state, action) {
 
         const newCurrentGuess = newRows[state.currentRow].join("");
 
-        // console.log(`row ${state.currentRow}`);
-        // console.log(`index ${state.currentIndex}`);
-        // console.log(`currentguess ${state.currentGuess}`);
-        // console.log(`guesses ${state.guesses}`);
-        // console.log(`colors ${state.colors}`);
+        console.log(`row ${state.currentRow}`);
+        console.log(`index ${state.currentIndex}`);
+        console.log(`currentguess ${state.currentGuess}`);
+        console.log(`guesses ${state.guesses}`);
+        console.log(`colors ${state.colors}`);
         return {
           ...state,
           rows: newRows,
@@ -94,38 +94,48 @@ export function reducer(state, action) {
         ...initialState,
       };
     }
+    case "SET_ANSWER":
+      return {
+        ...state,
+        answer: action.payload,
+      };
 
-    case "MOVE_ROW":
-      {
-        const isCurrentRowFull = state.rows[state.currentRow].every(
-          (cell) => cell !== ""
+    case "MOVE_ROW": {
+      const isCurrentRowFull = state.rows[state.currentRow].every(
+        (cell) => cell !== ""
+      );
+
+      console.log("isCurrentRowFull:", isCurrentRowFull);
+      console.log("CurrentGuess before change:", state.currentGuess);
+
+      if (isCurrentRowFull) {
+        const newGuesses = [...state.guesses, state.currentGuess];
+        const newColors = state.colors.map((row, rowIndex) =>
+          rowIndex === state.currentRow
+            ? state.rows[state.currentRow].map((cell, cellIndex) =>
+                getColorClass(cell, cellIndex, state.answer)
+              )
+            : row
         );
 
-        if (isCurrentRowFull) {
-          const newGuesses = [...state.guesses, state.currentGuess];
+        console.log("NewGuesses:", newGuesses);
+        console.log("NewColors:", newColors);
 
-          const newColors = state.colors.map((row, rowIndex) =>
-            rowIndex === state.currentRow
-              ? state.rows[state.currentRow].map((cell, cellIndex) =>
-                  getColorClass(cell, cellIndex, state.answer)
-                )
-              : row
-          );
-          const newState = {
-            ...state,
-            currentRow: Math.min(state.currentRow + 1, state.rows.length - 1),
-            currentIndex: 0,
-            guesses: newGuesses,
-            currentGuess: "",
-            colors: newColors,
-          };
-
-          return newState;
-        } else {
-          console.log("當前行尚未填滿");
-        }
+        return {
+          ...state,
+          currentRow: Math.min(state.currentRow + 1, state.rows.length - 1),
+          currentIndex: 0,
+          guesses: newGuesses,
+          currentGuess: "",
+          colors: newColors,
+        };
+      } else {
+        console.log("當前行尚未填滿");
+        // 不清空 currentGuess
+        return state;
       }
-      break;
+    }
+
     default:
       return state;
   }
